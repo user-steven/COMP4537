@@ -1,0 +1,64 @@
+body,
+html {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+#time-container {
+    text-align: right;
+    padding: 10px;
+    background-color: #f0f0f0;
+}
+
+#reader-container {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+footer {
+    background-color: #333;
+    color: white;
+    padding: 10px;
+    display: flex;
+    height: auto;
+    justify-content: space-between;
+    align-items: center;
+}
+
+
+.ReaderTextbox {
+    border-color: black;
+    border-style: solid;
+    width: 250px;
+    height: 150px;
+    padding: 5px;
+    margin-bottom: 5px;
+    word-wrap: break-word;
+    white-space: pre;
+    overflow-y: auto;
+}
+
+#back-button {
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#back-button:hover {
+    background-color: #0056b3;
+}
