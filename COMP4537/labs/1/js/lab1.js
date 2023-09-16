@@ -205,19 +205,18 @@ document.addEventListener('DOMContentLoaded', function () {
     updateTime();
 
     // Set key to JSON object in localstorage
-    let key = "notes";
-    let bodyId = document.body.id;
+    const key = "notes";
+    const bodyId = document.body.id;
 
     if (bodyId === 'writer') {
         document.getElementById("writer-add-button").addEventListener("click", () => {
-            console.log("New note added.")
             createNote(key);
         });
 
         renderWriter(key);
 
         setInterval(function () {
-            intervalUpdateNotes(key)
+            intervalUpdateNotes(key);
             updateTime();
         }, 2000);
     } else if (bodyId == "reader") {
