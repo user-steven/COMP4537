@@ -1,40 +1,5 @@
-/**
- * Initializes page renders for reader.html and writer.html
- */
-document.addEventListener('DOMContentLoaded', function () {
-    console.log('Document is ready.');
-
-    // Set back button to return to index.html
-    document.getElementById("back-button").addEventListener("click", function () {
-        window.location.href = "index.html";
-    })
-
-    updateTime();
-
-    // Set key to JSON object in localstorage
-    const key = "notes";
-    const bodyId = document.body.id;
-
-    if (bodyId === 'writer') {
-        document.getElementById("writer-add-button").addEventListener("click", () => {
-            createNote(key);
-        });
-
-        renderWriter(key);
-
-        setInterval(function () {
-            intervalUpdateNotes(key);
-            updateTime();
-        }, 2000);
-    } else if (bodyId == "reader") {
-        renderReader(key);
-
-        setInterval(function () {
-            renderReader(key);
-            updateTime();
-        }, 2000);
-    }
-});
+// Set key to JSON object in localstorage
+const key = "notes";
 
 /**
  * A class that represents a Note object.
@@ -228,3 +193,39 @@ function updateTime() {
     const updateTime = document.getElementById("update-time");
     updateTime.innerHTML = getCurrentTime();
 }
+
+/**
+ * Initializes page renders for reader.html and writer.html
+ */
+document.addEventListener('DOMContentLoaded', function () {
+    console.log('Document is ready.');
+
+    // Set back button to return to index.html
+    document.getElementById("back-button").addEventListener("click", function () {
+        window.location.href = "index.html";
+    })
+
+    updateTime();
+
+    const bodyId = document.body.id;
+
+    if (bodyId === 'writer') {
+        document.getElementById("writer-add-button").addEventListener("click", () => {
+            createNote(key);
+        });
+
+        renderWriter(key);
+
+        setInterval(function () {
+            intervalUpdateNotes(key);
+            updateTime();
+        }, 2000);
+    } else if (bodyId == "reader") {
+        renderReader(key);
+
+        setInterval(function () {
+            renderReader(key);
+            updateTime();
+        }, 2000);
+    }
+});
