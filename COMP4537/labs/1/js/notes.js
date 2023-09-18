@@ -1,6 +1,3 @@
-// Set key to JSON object in localstorage
-const key = "notes";
-
 /**
  * A class that represents a Note object.
  */
@@ -78,9 +75,10 @@ class Note {
  * Creates a Note object and adds it to localstorage and appends writer element to DOM.
  * 
  * @param {string} key The identifier for the group of notes.
+ * @param {string} containerId HTML Element ID for writer container
  */
-function createNote(key) {
-    const writerContainer = document.getElementById("writer-container");
+export function createNote(key, containerId) {
+    const writerContainer = document.getElementById(containerId);
     const note = new Note(key);
     pushNote(key, note);
     writerContainer.appendChild(note.createWriterNoteElement());
@@ -101,7 +99,7 @@ function getDataFromLocalStorage(key) {
  * 
  * @param {string} key The identifier for the group of Notes.
  */
-function intervalUpdateNotes(key) {
+export function intervalUpdateNotes(key) {
     const notesArr = getDataFromLocalStorage(key);
     // Iterate through each onscreen note and if values differ from localstorage, update.
     notesArr.forEach((note) => {
@@ -131,10 +129,11 @@ function pushNote(key, note) {
  * Renders reader view.
  * 
  * @param {string} key The identifier for group of Notes.
+ * @param {string} containerId HTML Element ID for reader container
  */
-function renderReader(key) {
+export function renderReader(key, containerId) {
     // Empty current view of reader container
-    const readerContainer = document.getElementById("reader-container");
+    const readerContainer = document.getElementById(containerId);
     readerContainer.innerHTML = "";
 
     // Retrieve serialized object from localstorage and deserialize bac into note[]
@@ -152,9 +151,10 @@ function renderReader(key) {
  * Renders writer view.
  * 
  * @param {string} key The identifier for group of Notes.
+ * @param {string} containerId HTML Element ID for writer container
  */
-function renderWriter(key) {
-    const writerContainer = document.getElementById("writer-container");
+export function renderWriter(key, containerId) {
+    const writerContainer = document.getElementById(containerId);
     writerContainer.innerHTML = "";
     const notesArr = getDataFromLocalStorage(key);
     notesArr.forEach((note) => {
@@ -188,44 +188,10 @@ function getCurrentTime() {
 
 /**
  * Updates update-time span with the current time.
+ * 
+ * @param {string} containerId HTML Element ID for time container
  */
-function updateTime() {
-    const updateTime = document.getElementById("update-time");
+export function updateTime(containerId) {
+    const updateTime = document.getElementById(containerId);
     updateTime.innerHTML = getCurrentTime();
 }
-
-/**
- * Initializes page renders for reader.html and writer.html
- */
-document.addEventListener('DOMContentLoaded', function () {
-    console.log('Document is ready.');
-
-    // Set back button to return to index.html
-    document.getElementById("back-button").addEventListener("click", function () {
-        window.location.href = "index.html";
-    })
-
-    updateTime();
-
-    const bodyId = document.body.id;
-
-    if (bodyId === 'writer') {
-        document.getElementById("writer-add-button").addEventListener("click", () => {
-            createNote(key);
-        });
-
-        renderWriter(key);
-
-        setInterval(function () {
-            intervalUpdateNotes(key);
-            updateTime();
-        }, 2000);
-    } else if (bodyId == "reader") {
-        renderReader(key);
-
-        setInterval(function () {
-            renderReader(key);
-            updateTime();
-        }, 2000);
-    }
-});
