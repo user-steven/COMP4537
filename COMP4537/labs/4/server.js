@@ -1,4 +1,4 @@
-const Word = require('./classes/Word');
+const utils = require('./modules/utils');
 const http = require('http');
 const url = require('url');
 const GET = "GET";
@@ -6,23 +6,13 @@ const POST = "POST";
 const endPoint = "/COMP4537/labs/4/api/definitions/";
 const PORT = process.env.PORT || 3000;
 
-const hello = new Word("hello", "a greeting");
-const dictionary = [hello];
+// Testing GET request
+// const hello = new Word("hello", "a greeting");
+const dictionary = [];
 
+// Counter for number of requests
+let requestCount = 0;
 
-function addWord(word, definition) {
-    const newWord = new Word(word, definition);
-    dictionary.push(newWord);
-}
-
-function indexOfWord(word) {
-    for (let i = 0; i < dictionary.length; i++) {
-        if (dictionary[i].word == word) {
-            return i;
-        }
-    }
-    return null;
-}
 
 http.createServer(function (req, res) {
     res.writeHead(200, {
@@ -35,9 +25,10 @@ http.createServer(function (req, res) {
 
     if (req.method == GET) {
         const query = url.parse(req.url, true).query;
-        const word = query.word.toLowerCase();
-        const index = indexOfWord(word);
-        if (index != null) {
+        const word = query.word;
+        const index = utils.indexOfWord(word.toLowerCase(), dictionary);
+
+        if (utils.wordValidation(word) && index !== null) {
             res.end(JSON.stringify({ word: dictionary[index].word, definition: dictionary[index].definition }));
         } else {
             res.end(JSON.stringify({ msg: `${word} not found in dictionary.` }));
@@ -49,22 +40,26 @@ http.createServer(function (req, res) {
         req.on('data', function(chunk) {
             if (chunk != null) {
                 body += chunk;
+                console.log(body);
             }
         });
 
         req.on('end', function() {
-            // const query = url.parse(body, true).query;
-            const query = JSON.parse(body);
+            const query = url.parse(body, true).query; // Query string/Raw Text
+            // const query = JSON.parse(body); // Raw JSON
             console.log(query);
-            const word = query.word.toLowerCase();
+            const word = query.word;
             const definition = query.definition;
-            const index = indexOfWord(word);
+            const index = utils.indexOfWord(word.toLowerCase(), dictionary);
 
-            if (index != null) {
-                res.end(JSON.stringify({ msg: `${word} already exists in dictionary.` }));
+            if (index === null && utils.wordValidation(word) && utils.definitionValidation(definition)) {
+                requestCount++;
+                utils.addWord(word, definition, dictionary);
+                res.end(JSON.stringify({ msg: `Request #${requestCount}: ${word} added to dictionary.` }));
+            } else if (!utils.wordValidation(word) || !utils.definitionValidation(definition)) {
+                res.end(JSON.stringify({ msg: `Word: ${word} and/or definition is invalid.` }));
             } else {
-                addWord(word, definition);
-                res.end(JSON.stringify({ msg: `${word} added to dictionary.` }));
+                res.end(JSON.stringify({ msg: `${word} already exists in dictionary.` }));
             }
         });
     }
