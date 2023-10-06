@@ -36,8 +36,7 @@ http.createServer(function (req, res) {
             res.end(JSON.stringify({
                 req_num: `${requestCount}`,
                 word: dictionary[index].word,
-                definition: dictionary[index].definition,
-                msg: `Request #${requestCount}: ${word} found in dictionary.`
+                definition: dictionary[index].definition
             }));
         } else if (!validWord) {
             res.writeHead(400, commonHeaders);
