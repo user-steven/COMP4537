@@ -13,14 +13,14 @@ const dictionary = [];
 // Counter for number of requests
 let requestCount = 0;
 
+const commonHeaders = {
+    "Content-Type": "application/json",
+    "Access-Control-Allow-Origin": "https://nandynano.com",
+    "Access-Control-Allow-Methods": "GET, POST"
+}
+
 
 http.createServer(function (req, res) {
-    res.writeHead(200, {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "GET, POST"
-        });
-
     console.log(`${req.method} request for ${req.url}`);
 
     if (req.method == GET) {
@@ -31,9 +31,11 @@ http.createServer(function (req, res) {
         const index = utils.indexOfWord(word.toLowerCase(), dictionary);
 
         if (utils.wordValidation(word) && index !== null) {
-            res.end(JSON.stringify({ word: dictionary[index].word, definition: dictionary[index].definition }));
+            res.writeHead(200, commonHeaders);
+            res.end(JSON.stringify({ req_num: `${requestCount}`, word: dictionary[index].word, definition: dictionary[index].definition }));
         } else {
-            res.end(JSON.stringify({ msg: `Request #${requestCount}: ${word} not found in dictionary.` }));
+            res.writeHead(400, commonHeaders);
+            res.end(JSON.stringify({ error: "Bad Request", req_num: `${requestCount}`, msg: `Request #${requestCount}: ${word} not found in dictionary.` }));
         }
     }
 
@@ -57,13 +59,15 @@ http.createServer(function (req, res) {
             const index = utils.indexOfWord(word.toLowerCase(), dictionary);
 
             if (index === null && utils.wordValidation(word) && utils.definitionValidation(definition)) {
-
+                res.writeHead(200, commonHeaders);
                 utils.addWord(word, definition, dictionary);
-                res.end(JSON.stringify({ msg: `Request #${requestCount}: ${word} added to dictionary.` }));
+                res.end(JSON.stringify({ req_num: `${requestCount}`, msg: `Request #${requestCount}: ${word} added to dictionary.` }));
             } else if (!utils.wordValidation(word) || !utils.definitionValidation(definition)) {
-                res.end(JSON.stringify({ msg: `Request #${requestCount}: Word = ${word} and/or definition is invalid.` }));
+                res.writeHead(400, commonHeaders);
+                res.end(JSON.stringify({ error: "Bad Request", req_num: `${requestCount}`, msg: `Request #${requestCount}: Word = ${word} and/or definition is invalid.` }));
             } else {
-                res.end(JSON.stringify({ msg: `Request #${requestCount}: ${word} already exists in dictionary.` }));
+                res.writeHead(400, commonHeaders);
+                res.end(JSON.stringify({ error: "Bad Request", req_num: `${requestCount}`, msg: `Request #${requestCount}: ${word} already exists in dictionary.` }));
             }
         });
     }
