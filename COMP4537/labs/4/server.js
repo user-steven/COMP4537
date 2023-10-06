@@ -29,14 +29,22 @@ http.createServer(function (req, res) {
         const query = url.parse(req.url, true).query;
         const word = query.word;
         const index = utils.indexOfWord(word.toLowerCase(), dictionary);
+        const validWord = utils.wordValidation(word);
 
-        if (utils.wordValidation(word) && index !== null) {
+        if (validWord && index !== null) {
             res.writeHead(200, commonHeaders);
             res.end(JSON.stringify({
                 req_num: `${requestCount}`,
                 word: dictionary[index].word,
                 definition: dictionary[index].definition,
                 msg: `Request #${requestCount}: ${word} found in dictionary.`
+            }));
+        } else if (!validWord) {
+            res.writeHead(400, commonHeaders);
+            res.end(JSON.stringify({
+                error: "Bad Request",
+                req_num: `${requestCount}`,
+                msg: `Request #${requestCount}: Word = ${word} is invalid.`
             }));
         } else {
             res.writeHead(400, commonHeaders);
@@ -66,20 +74,29 @@ http.createServer(function (req, res) {
             const word = query.word;
             const definition = query.definition;
             const index = utils.indexOfWord(word.toLowerCase(), dictionary);
+            const validWord = utils.wordValidation(word);
+            const validDefinition = utils.definitionValidation(definition);
 
-            if (index === null && utils.wordValidation(word) && utils.definitionValidation(definition)) {
+            if (index === null && validWord && validDefinition) {
                 res.writeHead(200, commonHeaders);
                 utils.addWord(word, definition, dictionary);
                 res.end(JSON.stringify({
                     req_num: `${requestCount}`,
                     msg: `Request #${requestCount}: ${word} added to dictionary.`
                 }));
-            } else if (!utils.wordValidation(word) || !utils.definitionValidation(definition)) {
+            } else if (!validWord) {
                 res.writeHead(400, commonHeaders);
                 res.end(JSON.stringify({
                     error: "Bad Request",
                     req_num: `${requestCount}`,
-                    msg: `Request #${requestCount}: Word = ${word} and/or definition is invalid.`
+                    msg: `Request #${requestCount}: Word = ${word} is invalid.`
+                }));
+            } else if (!validDefinition) {
+                res.writeHead(400, commonHeaders);
+                res.end(JSON.stringify({
+                    error: "Bad Request",
+                    req_num: `${requestCount}`,
+                    msg: `Request #${requestCount}: Definition = ${definition} is invalid.`
                 }));
             } else {
                 res.writeHead(400, commonHeaders);
