@@ -24,6 +24,8 @@ http.createServer(function (req, res) {
     console.log(`${req.method} request for ${req.url}`);
 
     if (req.method == GET) {
+        requestCount++;
+
         const query = url.parse(req.url, true).query;
         const word = query.word;
         const index = utils.indexOfWord(word.toLowerCase(), dictionary);
@@ -31,11 +33,13 @@ http.createServer(function (req, res) {
         if (utils.wordValidation(word) && index !== null) {
             res.end(JSON.stringify({ word: dictionary[index].word, definition: dictionary[index].definition }));
         } else {
-            res.end(JSON.stringify({ msg: `${word} not found in dictionary.` }));
+            res.end(JSON.stringify({ msg: `Request #${requestCount}: ${word} not found in dictionary.` }));
         }
     }
 
     if (req.method == POST && req.url == endPoint) {
+        requestCount++;
+
         let body = "";
         req.on('data', function(chunk) {
             if (chunk != null) {
@@ -53,13 +57,13 @@ http.createServer(function (req, res) {
             const index = utils.indexOfWord(word.toLowerCase(), dictionary);
 
             if (index === null && utils.wordValidation(word) && utils.definitionValidation(definition)) {
-                requestCount++;
+
                 utils.addWord(word, definition, dictionary);
                 res.end(JSON.stringify({ msg: `Request #${requestCount}: ${word} added to dictionary.` }));
             } else if (!utils.wordValidation(word) || !utils.definitionValidation(definition)) {
-                res.end(JSON.stringify({ msg: `Word: ${word} and/or definition is invalid.` }));
+                res.end(JSON.stringify({ msg: `Request #${requestCount}: Word = ${word} and/or definition is invalid.` }));
             } else {
-                res.end(JSON.stringify({ msg: `${word} already exists in dictionary.` }));
+                res.end(JSON.stringify({ msg: `Request #${requestCount}: ${word} already exists in dictionary.` }));
             }
         });
     }
