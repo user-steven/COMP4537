@@ -4,12 +4,14 @@ const url = require('url');
 const GET = "GET";
 const POST = "POST"
 const ENDPOINT = "/COMP4537/labs/5/api/";
+
 const commonHeaders = {
     "Content-Type": "application/json",
     "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Methods": "GET, POST"
 };
 
+// DB Connection Configurations
 const DB_CONFIG = {
     host: "localhost",
     user: "stevenct_lab5",
@@ -17,11 +19,13 @@ const DB_CONFIG = {
     database: "stevenct_lab5"
 };
 
+// Table name
 const TABLE_NAME = "Patients";
 
-
+// Create connection to database
 const db = mysql.createConnection(DB_CONFIG);
 
+// Connect to database
 db.connect(function (err) {
     if (err) {
         console.error("Error connecting to database: ", err);
@@ -38,11 +42,13 @@ db.connect(function (err) {
     }
 })
 
+// Validate query to ensure it is a SELECT or INSERT statement
 function validateQuery(statement) {
     const regex = /^(SELECT|INSERT)[\s\S]*$/i;
     return regex.test(statement);
 }
 
+// Create server
 const server = http.createServer(function (req, res) {
 
     console.log(`${req.method} request for ${req.url}`);
@@ -62,19 +68,15 @@ const server = http.createServer(function (req, res) {
         }
 
         if (validateQuery(mysqlQuery)) {
-            try {
-                db.connect(() => {
-                    db.query(mysqlQuery, function (err, result) {
-                        if (err) throw err;
-                        res.writeHead(200, commonHeaders);
-                        res.end(JSON.stringify({ "msg": result }));
-                    })
-                })
-            } catch (err) {
-                res.writeHead(400, commonHeaders);
-                res.end(JSON.stringify({ "msg": err.message }));
-            }
-
+            db.query(mysqlQuery, function (err, result) {
+                if (err) {
+                    res.writeHead(400, commonHeaders);
+                    res.end(JSON.stringify({ "msg": err.message }));
+                } else {
+                    res.writeHead(200, commonHeaders);
+                    res.end(JSON.stringify({ "msg": result }));
+                }
+            });
         } else {
             res.writeHead(400, commonHeaders);
             res.end(JSON.stringify({ "msg": "Request contained operations other than SELECT and INSERT." }))
