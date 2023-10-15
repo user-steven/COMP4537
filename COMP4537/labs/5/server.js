@@ -7,7 +7,7 @@ const ENDPOINT = "/COMP4537/labs/5/api/";
 
 const commonHeaders = {
     "Content-Type": "application/json",
-    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Origin": "https://nandynano.com",
     "Access-Control-Allow-Methods": "GET, POST"
 };
 
