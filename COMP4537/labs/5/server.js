@@ -103,7 +103,7 @@ const server = http.createServer(function (req, res) {
                         res.end(JSON.stringify({ "msg": err.message }));
                     } else {
                         res.writeHead(200, commonHeaders);
-                        res.end(JSON.stringify({ "msg": `Successfully inserted ${result.affectedRows} rows.`, "result": result }));
+                        res.end(JSON.stringify({ "msg": `Successfully inserted ${result.affectedRows} rows.`}));
                     }
                 });
             } else {
