@@ -55,6 +55,16 @@ const server = http.createServer(function (req, res) {
 
     if (req.method == GET) {
 
+        const sql = `CREATE TABLE IF NOT EXISTS ${TABLE_NAME} (patientid INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(100), dateOfBirth DATETIME)`;
+
+        db.query(sql, function (err, result) {
+            if (err) {
+                console.error("Error creating table: ", err);
+            } else {
+                console.log("Table created!");
+            }
+        });
+
         urlString = url.parse(req.url, true).pathname;
 
         mysqlQuery = decodeURIComponent(urlString.substring(urlString.lastIndexOf('/') + 1)).replace(/["\\]/g, '');
@@ -84,6 +94,17 @@ const server = http.createServer(function (req, res) {
     }
 
     if (req.method == POST && req.url == ENDPOINT) {
+
+        const sql = `CREATE TABLE IF NOT EXISTS ${TABLE_NAME} (patientid INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(100), dateOfBirth DATETIME)`;
+
+        db.query(sql, function (err, result) {
+            if (err) {
+                console.error("Error creating table: ", err);
+            } else {
+                console.log("Table created!");
+            }
+        });
+
         let body = "";
 
         req.on('data', function (chunk) {
