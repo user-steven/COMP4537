@@ -57,7 +57,7 @@ const server = http.createServer(function (req, res) {
 
         urlString = url.parse(req.url, true).pathname;
 
-        mysqlQuery = decodeURIComponent(urlString.substring(urlString.lastIndexOf('/') + 1)).replace(/['"\\]/g, '');
+        mysqlQuery = decodeURIComponent(urlString.substring(urlString.lastIndexOf('/') + 1)).replace(/["\\]/g, '');
 
         if (mysqlQuery) {
             console.log(`Received query: ${mysqlQuery}`);
