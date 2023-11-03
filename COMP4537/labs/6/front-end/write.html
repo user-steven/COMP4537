@@ -7,33 +7,33 @@
 </head>
 <body>
 
-    <div id="input_container">
-
-        <select id="input_word_language">
-        </select>
-
-        <textarea id="input_word" placeholder="Word"></textarea>
-        <br>
-
-        <select id="input_definition_language">
-        </select>
-
-
-        <textarea id="input_definition" placeholder="Definition"></textarea>
-        <br><br>
-
-        <button id="button_add">Add new definition</button>
-
-    </div>
-
-    <div id="delete_container">
-
-        <textarea id="input_delete" placeholder="word to delete"></textarea>
-        <br><br>
-
-        <button id="button_delete"> Delete</button>
+    <form id="form_add_word">
+        <h2>Add Word and Definition</h2>
+        <label for="input_word">Word:</label>
+        <input type="text" id="input_word" name="word" required>
         
-    </div>
+        <label for="input_word_language">Word Language:</label>
+        <select id="input_word_language" name="word_language">
+        </select>
+
+        <label for="input_definition">Definition:</label>
+        <input type="text" id="input_definition" name="definition" required>
+        
+        <label for="input_definition_language">Definition Language:</label>
+        <select id="input_definition_language" name="definition_language">
+        </select>
+
+        <input type="submit" value="Add">
+    </form>
+
+
+    <form id="form_delete_word">
+        <h2>Delete Word</h2>
+        <label for="input_delete">Word to Delete:</label>
+        <input type="text" id="input_delete" name="word_to_delete" required>
+
+        <input type="submit" value="Delete">
+    </form>
 
     <div id="status_msg"></div>
 

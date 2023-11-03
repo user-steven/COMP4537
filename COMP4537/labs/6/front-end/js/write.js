@@ -19,15 +19,13 @@ const INPUT_DEFINITION_LANGUAGE = document.getElementById('input_definition_lang
 const INPUT_WORD = document.getElementById('input_word');
 const INPUT_DEFINiTION = document.getElementById('input_definition');
 const INPUT_DELETE = document.getElementById('input_delete');
-const BUTTON_DELETE = document.getElementById('button_delete');
-const BUTTON_SUBMIT = document.getElementById('button_add');
+const FORM_DELETE = document.getElementById('form_delete_word');
+const FORM_ADD = document.getElementById('form_add_word');
 const STATUS_MSG = document.getElementById('status_msg');
 
 // Constants
 const ENGLISH = "English";
 const ENGLISH_VALUE = "en"
-const WORD_LANGUAGE_DROPDOWN_OPTION = "Word Language";
-const DEFINITION_LANGUAGE_DROPDOWN_OPTION = "Definition Language";
 const EMPTY_STRING = "";
 
 // Status messages
@@ -37,8 +35,6 @@ const BAD_WORD_MSG = "Please enter a valid word.";
 const BAD_DEFINITION_MSG = "Please enter a valid definition.";
 const GOOD_SERVER_RESPONSE = "Successful, server response: ";
 const BAD_SERVER_RESPONSE = "Something went wrong, status code: ";
-const BAD_WORD_LANGUAGE_MSG = "Please select a word language.";
-const BAD_DEFINITION_LANGUAGE_MSG = "Please select a definition language.";
 const ERROR = "Error: ";
 
 // Prompt messages
@@ -56,10 +52,6 @@ function formatParams(word_language, word, definition_language, definition) {
 
 function populateDropdown() {
     xhttp.open(GET, SERVER_URL_GET_LANGUAGES, true);
-
-    INPUT_WORD_LANGUAGE.innerHTML = '<option>' + WORD_LANGUAGE_DROPDOWN_OPTION + '</option>';
-    INPUT_DEFINITION_LANGUAGE.innerHTML = '<option>' + DEFINITION_LANGUAGE_DROPDOWN_OPTION + '</option>';
-
     xhttp.onreadystatechange = function () {
         if (this.readyState == 4 && this.status == 200) {
             const languages = JSON.parse(xhttp.response).languages;
@@ -106,32 +98,34 @@ function wordExists(word) {
     xhttp.send();
 }
 
-function deleteDefiniion() {
-    const word = INPUT_DELETE.value;
-
+function deleteDefiniion(word) {
     if (word === EMPTY_STRING || /\d/.test(word)) {
         // Invalid word
         STATUS_MSG.style.color = BAD_STATUS_MSG_COLOR;
         STATUS_MSG.innerText = BAD_WORD_MSG;
     } else {
-        xhttp.open(DELETE, SERVER_URL_POST_DEFINITION + '/' + params.word, true);
+        xhttp.open(DELETE, SERVER_URL_POST_DEFINITION + '/' + word, true);
 
         xhttp.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
+                const response = JSON.parse(this.response);
+
                 STATUS_MSG.style.color = GOOD_STATUS_MSG_COLOR;
-                STATUS_MSG.innerText = GOOD_SERVER_RESPONSE + JSON.stringify(response.msg);
+                STATUS_MSG.innerText = GOOD_SERVER_RESPONSE + JSON.stringify(response);
             } else if (this.readyState == 4 && this.status != 200) {
+                const response = JSON.parse(this.response);
+
                 STATUS_MSG.style.color = BAD_STATUS_MSG_COLOR;
-                STATUS_MSG.innerText = GOOD_SERVER_RESPONSE + JSON.stringify(response.msg);
+                STATUS_MSG.innerText = GOOD_SERVER_RESPONSE + JSON.stringify(response);
             }
         }
-            
+
         xhttp.send();
     }
 }
 
 function postDefinition(params) {
-    xhttp.open(POST, SERVER_URL_POST_DEFINITION, true);
+    xhttp.open(POST, SERVER_URL_POST_DEFINITION + '/' + params.word, true);
     xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8")
 
     xhttp.onreadystatechange = function () {
@@ -139,7 +133,7 @@ function postDefinition(params) {
             const response = JSON.parse(this.response);
 
             STATUS_MSG.style.color = GOOD_STATUS_MSG_COLOR;
-            STATUS_MSG.innerText = GOOD_SERVER_RESPONSE + JSON.stringify(response.msg);
+            STATUS_MSG.innerText = GOOD_SERVER_RESPONSE + JSON.stringify(response);
         } else if (this.readyState == 4 && this.status != 200) {
             const response = JSON.parse(this.response);
 
@@ -186,22 +180,15 @@ function addNewDefinition() {
         // Invalid definition
         STATUS_MSG.style.color = BAD_STATUS_MSG_COLOR;
         STATUS_MSG.innerText = BAD_DEFINITION_MSG;
-    } else if (word_language === WORD_LANGUAGE_DROPDOWN_OPTION) {
-        // Invalid word language
-        STATUS_MSG.style.color = BAD_STATUS_MSG_COLOR;
-        STATUS_MSG.innerText = BAD_WORD_LANGUAGE_MSG;
-    } else if (definition_language === DEFINITION_LANGUAGE_DROPDOWN_OPTION) {
-        // Invalid definition language
-        STATUS_MSG.style.color = BAD_STATUS_MSG_COLOR;
-        STATUS_MSG.innerText = BAD_DEFINITION_LANGUAGE_MSG;
-    }
-    else {
+    } else {
         // If work exists, prompt user if they want to update entry.
         const params = formatParams(word_language, word, definition_language, definition);
 
         if (wordExists(word)) {
             const user_response = window.confirm(WORD_EXISTS_PROMPT);
-            if (user_response) { patchDefinition(params); }
+            if (user_response) { 
+                patchDefinition(params);
+            }
         } else {
             postDefinition(params);
         }
@@ -210,6 +197,13 @@ function addNewDefinition() {
 
 document.addEventListener("DOMContentLoaded", () => {
     populateDropdown();
-    BUTTON_SUBMIT.addEventListener('click', addNewDefinition);
-    BUTTON_DELETE.addEventListener('click', deleteDefiniion);
+    FORM_ADD.addEventListener('submit', function(event) {
+        event.preventDefault();
+        addNewDefinition();
+    });
+    FORM_DELETE.addEventListener('submit', function(event) {
+        event.preventDefault();
+        const word = INPUT_DELETE.value;
+        deleteDefiniion(word);
+    });
 });

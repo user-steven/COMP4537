@@ -4,9 +4,12 @@ const SERVER_URL_POST_DEFINITION = SERVER_URL + "/api/v1/definition";
 const GET = "GET";
 
 // Document elements
-const BUTTON_SEARCH = document.getElementById('button_search');
+const FORM_SEARCH = document.getElementById('form_search_word');
 const INPUT_WORD = document.getElementById('input_search');
 const STATUS_MSG = document.getElementById('status_msg');
+
+// Constants
+const EMPTY_STRING = "";
 
 // Status messages
 const GOOD_STATUS_MSG_COLOR = "green";
@@ -44,5 +47,8 @@ function search() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    BUTTON_SEARCH.addEventListener('click', search);
+    FORM_SEARCH.addEventListener('submit', function(event) {
+        event.preventDefault();
+        search();
+    });
 });

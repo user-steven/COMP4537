@@ -8,18 +8,17 @@
 </head>
 
 <body>
-    <div id="input_container"></div>
+    <h2>Search for Word</h2>
+    <form id="form_search_word">
+        <label for="input_search">Search word: </label>
+        <input type="text" id="input_search" name="word_to_search" required>
 
-    <textarea id="input_search" placeholder="Enter word to search"></textarea>
-
-    <button id="button_search">Search</button>
-
-    </div>
+        <input type="submit" value="Search">
+    </form>
 
     <div id="status_msg"></div>
 
     <script src="./js/search.js"></script>
-
 </body>
 
 </html>
