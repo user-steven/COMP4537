@@ -1,4 +1,4 @@
-const SERVER_URL = "";
+const SERVER_URL = "https://nandynano.com/COMP4537/labs/6";
 // 1. GET: retrieve the definition of a word from the database
 const SERVER_URL_POST_DEFINITION = SERVER_URL + "/api/v1/definition";
 const GET = "GET";
@@ -34,13 +34,13 @@ function search() {
                 const response = JSON.parse(xhttp.response);
 
                 STATUS_MSG.style.color = GOOD_STATUS_MSG_COLOR;
-                STATUS_MSG.value = response.msg;
+                STATUS_MSG.value = JSON.stringify(response);
 
             } else if (this.readyState == 4 && this.status != 200) {
                 const response = JSON.parse(xhttp.response);
 
                 STATUS_MSG.style.color = BAD_STATUS_MSG_COLOR;
-                STATUS_MSG.value = response.msg;
+                STATUS_MSG.value = JSON.stringify(response);
             }
         }
     }

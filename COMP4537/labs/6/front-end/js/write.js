@@ -1,4 +1,4 @@
-const SERVER_URL = "";
+const SERVER_URL = "https://nandynano.com/COMP4537/labs/6";
 // 1. GET: For populating the dropdowns.
 const SERVER_URL_GET_LANGUAGES = SERVER_URL + "/api/v1/languages";
 // 1. GET: retrieve the definition of a word from the database
@@ -138,7 +138,7 @@ function postDefinition(params) {
             const response = JSON.parse(this.response);
 
             STATUS_MSG.style.color = BAD_STATUS_MSG_COLOR;
-            STATUS_MSG.innerText = BAD_SERVER_RESPONSE + this.status + "\n" + response;
+            STATUS_MSG.innerText = BAD_SERVER_RESPONSE + this.status + "\n" + JSON.stringify(response);
         }
     }
 
@@ -159,7 +159,7 @@ function patchDefinition(params) {
             const response = JSON.parse(this.response);
 
             STATUS_MSG.style.color = BAD_STATUS_MSG_COLOR;
-            STATUS_MSG.innerText = BAD_SERVER_RESPONSE + this.status + "\n" + response;
+            STATUS_MSG.innerText = BAD_SERVER_RESPONSE + this.status + "\n" + JSON.stringify(response);
         }
     }
 
