@@ -10,6 +10,7 @@ const SERVER_URL_POST_DEFINITION = SERVER_URL + "/api/v1/definition";
 const GET = "GET";
 const POST = "POST";
 const PATCH = "PATCH";
+const DELETE = "DELETE";
 const xhttp = new XMLHttpRequest();
 
 // Document elements
@@ -17,6 +18,8 @@ const INPUT_WORD_LANGUAGE = document.getElementById('input_word_language');
 const INPUT_DEFINITION_LANGUAGE = document.getElementById('input_definition_language');
 const INPUT_WORD = document.getElementById('input_word');
 const INPUT_DEFINiTION = document.getElementById('input_definition');
+const INPUT_DELETE = document.getElementById('input_delete');
+const BUTTON_DELETE = document.getElementById('button_delete');
 const BUTTON_SUBMIT = document.getElementById('button_add');
 const STATUS_MSG = document.getElementById('status_msg');
 
@@ -103,6 +106,30 @@ function wordExists(word) {
     xhttp.send();
 }
 
+function deleteDefiniion() {
+    const word = INPUT_DELETE.value;
+
+    if (word === EMPTY_STRING || /\d/.test(word)) {
+        // Invalid word
+        STATUS_MSG.style.color = BAD_STATUS_MSG_COLOR;
+        STATUS_MSG.innerText = BAD_WORD_MSG;
+    } else {
+        xhttp.open(DELETE, SERVER_URL_POST_DEFINITION + '/' + params.word, true);
+
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                STATUS_MSG.style.color = GOOD_STATUS_MSG_COLOR;
+                STATUS_MSG.innerText = GOOD_SERVER_RESPONSE + JSON.stringify(response.msg);
+            } else if (this.readyState == 4 && this.status != 200) {
+                STATUS_MSG.style.color = BAD_STATUS_MSG_COLOR;
+                STATUS_MSG.innerText = GOOD_SERVER_RESPONSE + JSON.stringify(response.msg);
+            }
+        }
+            
+        xhttp.send();
+    }
+}
+
 function postDefinition(params) {
     xhttp.open(POST, SERVER_URL_POST_DEFINITION, true);
     xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8")
@@ -112,7 +139,7 @@ function postDefinition(params) {
             const response = JSON.parse(this.response);
 
             STATUS_MSG.style.color = GOOD_STATUS_MSG_COLOR;
-            STATUS_MSG.innerText = GOOD_SERVER_RESPONSE + JSON.stringify(response.json);
+            STATUS_MSG.innerText = GOOD_SERVER_RESPONSE + JSON.stringify(response.msg);
         } else if (this.readyState == 4 && this.status != 200) {
             const response = JSON.parse(this.response);
 
@@ -184,4 +211,5 @@ function addNewDefinition() {
 document.addEventListener("DOMContentLoaded", () => {
     populateDropdown();
     BUTTON_SUBMIT.addEventListener('click', addNewDefinition);
+    BUTTON_DELETE.addEventListener('click', deleteDefiniion);
 });
