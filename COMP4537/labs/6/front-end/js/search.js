@@ -5,7 +5,7 @@ const GET = "GET";
 
 // Document elements
 const FORM_SEARCH = document.getElementById('form_search_word');
-const INPUT_WORD = document.getElementById('input_search');
+const INPUT_SEARCH = document.getElementById('input_search');
 const STATUS_MSG = document.getElementById('status_msg');
 
 // Constants
@@ -20,7 +20,7 @@ const ERROR = "Error: ";
 const xhttp = new XMLHttpRequest();
 
 function search() {
-    const word = INPUT_WORD.value;
+    const word = INPUT_SEARCH.value;
 
     if (word === EMPTY_STRING || /\d/.test(word)) {
         // Invalid word
@@ -44,6 +44,8 @@ function search() {
             }
         }
     }
+
+    xhttp.send();
 }
 
 document.addEventListener("DOMContentLoaded", () => {
