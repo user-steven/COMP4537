@@ -1,3 +1,14 @@
+import {
+    GOOD_STATUS_MSG_COLOR,
+    BAD_STATUS_MSG_COLOR,
+    BAD_WORD_MSG,
+    BAD_DEFINITION_MSG,
+    WORD_EXISTS_PROMPT,
+    SUCCESS_MESSAGE,
+    FAILURE_MESSAGE,
+    FORMAT_PARAMS
+} from "./common_strings.js";
+
 const SERVER_URL = "https://nandynano.com/COMP4537/labs/6";
 // 1. GET: For populating the dropdowns.
 const SERVER_URL_GET_LANGUAGES = SERVER_URL + "/api/v1/languages";
@@ -27,28 +38,14 @@ const STATUS_MSG = document.getElementById('status_msg');
 const ENGLISH = "English";
 const ENGLISH_VALUE = "en"
 const EMPTY_STRING = "";
-
-// Status messages
-const GOOD_STATUS_MSG_COLOR = "green";
-const BAD_STATUS_MSG_COLOR = "red";
-const BAD_WORD_MSG = "Please enter a valid word.";
-const BAD_DEFINITION_MSG = "Please enter a valid definition.";
-const GOOD_SERVER_RESPONSE = "Successful, server response: ";
-const BAD_SERVER_RESPONSE = "Something went wrong, status code: ";
-const ERROR = "Error: ";
-
-// Prompt messages
-const WORD_EXISTS_PROMPT = "Word exists, do you want to update?";
-
-// Format params
-function formatParams(word_language, word, definition_language, definition) {
-    return {
-        "word": word,
-        "definition": definition,
-        "word-language": word_language,
-        "definition-language": definition_language
-    }
-}
+const KEY_DEFINITION_LANGUAGE = "definition_language";
+const KEY_WORD_LANGUAGE = "word_language";
+const KEY_WORD = "word";
+const KEY_DEFINITION = "definition";
+const KEY_TOTAL = "total";
+const KEY_ERROR = "error";
+const KEY_MSG = "message";
+const KEY_ENTRY = "entry";
 
 function populateDropdown() {
     xhttp.open(GET, SERVER_URL_GET_LANGUAGES, true);
@@ -86,59 +83,85 @@ function populateDropdown() {
     xhttp.send();
 }
 
-function wordExists(word) {
-    xhttp.open(GET, SERVER_URL_POST_DEFINITION + "/" + word, true);
-    xhttp.onreadystatechange = function () {
-        if (this.readyState == 4 && this.status == 200) {
-            return true;
-        } else {
-            return false;
+async function wordExists(word) {
+    return new Promise((resolve) => {
+      xhttp.open(GET, SERVER_URL_POST_DEFINITION + '/' + encodeURIComponent(word), true);
+  
+      xhttp.onreadystatechange = function () {
+        if (this.readyState == 4) {
+          resolve(this.status === 200 ? true : false);
         }
-    }
-    xhttp.send();
-}
+      };
+  
+      xhttp.send();
+    });
+  }
+  
+  
+function deleteDefinition() {
+    const word = INPUT_DELETE.value;
 
-function deleteDefiniion(word) {
     if (word === EMPTY_STRING || /\d/.test(word)) {
         // Invalid word
         STATUS_MSG.style.color = BAD_STATUS_MSG_COLOR;
-        STATUS_MSG.innerText = BAD_WORD_MSG;
+        STATUS_MSG.innerHTML = BAD_WORD_MSG;
     } else {
-        xhttp.open(DELETE, SERVER_URL_POST_DEFINITION + '/' + word, true);
-
+        xhttp.open(DELETE, SERVER_URL_POST_DEFINITION + '/' + encodeURIComponent(word), true);
+        xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
         xhttp.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
                 const response = JSON.parse(this.response);
 
                 STATUS_MSG.style.color = GOOD_STATUS_MSG_COLOR;
-                STATUS_MSG.innerText = GOOD_SERVER_RESPONSE + JSON.stringify(response);
+                STATUS_MSG.innerHTML = SUCCESS_MESSAGE(
+                    response[KEY_MSG], 
+                    response[KEY_ENTRY][KEY_WORD], 
+                    response[KEY_ENTRY][KEY_DEFINITION], 
+                    response[KEY_ENTRY][KEY_WORD_LANGUAGE], 
+                    response[KEY_ENTRY][KEY_DEFINITION_LANGUAGE], 
+                    response[KEY_TOTAL], 
+                    this.status);
+                    
             } else if (this.readyState == 4 && this.status != 200) {
                 const response = JSON.parse(this.response);
 
                 STATUS_MSG.style.color = BAD_STATUS_MSG_COLOR;
-                STATUS_MSG.innerText = GOOD_SERVER_RESPONSE + JSON.stringify(response);
+                STATUS_MSG.innerHTML = FAILURE_MESSAGE(
+                    response[KEY_ERROR], 
+                    response[KEY_MSG], 
+                    this.status);
             }
         }
-
-        xhttp.send();
+        xhttp.send(JSON.stringify({ [KEY_WORD] : word }));
     }
 }
 
 function postDefinition(params) {
-    xhttp.open(POST, SERVER_URL_POST_DEFINITION + '/' + params.word, true);
-    xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8")
+    xhttp.open(POST, SERVER_URL_POST_DEFINITION + '/' + encodeURIComponent(params.word), true);
+    xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
 
     xhttp.onreadystatechange = function () {
-        if (this.readyState == 4 && this.status == 200) {
+        if (this.readyState == 4 && this.status == 201) {
             const response = JSON.parse(this.response);
 
             STATUS_MSG.style.color = GOOD_STATUS_MSG_COLOR;
-            STATUS_MSG.innerText = GOOD_SERVER_RESPONSE + JSON.stringify(response);
-        } else if (this.readyState == 4 && this.status != 200) {
+            STATUS_MSG.innerHTML = SUCCESS_MESSAGE(
+                response[KEY_MSG], 
+                response[KEY_ENTRY][KEY_WORD], 
+                response[KEY_ENTRY][KEY_DEFINITION], 
+                response[KEY_ENTRY][KEY_WORD_LANGUAGE], 
+                response[KEY_ENTRY][KEY_DEFINITION_LANGUAGE], 
+                response[KEY_TOTAL], 
+                this.status);
+        
+        } else if (this.readyState == 4 && this.status != 201) {
             const response = JSON.parse(this.response);
 
             STATUS_MSG.style.color = BAD_STATUS_MSG_COLOR;
-            STATUS_MSG.innerText = BAD_SERVER_RESPONSE + this.status + "\n" + JSON.stringify(response);
+            STATUS_MSG.innerHTML = FAILURE_MESSAGE(
+                response[KEY_ERROR], 
+                response[KEY_MSG], 
+                this.status);
         }
     }
 
@@ -146,27 +169,38 @@ function postDefinition(params) {
 }
 
 function patchDefinition(params) {
-    xhttp.open(PATCH, SERVER_URL_POST_DEFINITION + params.word, true);
-    xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8")
+    xhttp.open(PATCH, SERVER_URL_POST_DEFINITION + '/' + encodeURIComponent(params.word), true);
+    xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
 
     xhttp.onreadystatechange = function () {
         if (this.readyState == 4 && this.status == 200) {
             const response = JSON.parse(this.response);
 
             STATUS_MSG.style.color = GOOD_STATUS_MSG_COLOR;
-            STATUS_MSG.innerText = GOOD_SERVER_RESPONSE + JSON.stringify(response.json);
+            STATUS_MSG.innerHTML = SUCCESS_MESSAGE(
+                response[KEY_MSG], 
+                response[KEY_ENTRY][KEY_WORD], 
+                response[KEY_ENTRY][KEY_DEFINITION], 
+                response[KEY_ENTRY][KEY_WORD_LANGUAGE], 
+                response[KEY_ENTRY][KEY_DEFINITION_LANGUAGE], 
+                response[KEY_TOTAL], 
+                this.status);
+
         } else if (this.readyState == 4 && this.status != 200) {
             const response = JSON.parse(this.response);
 
             STATUS_MSG.style.color = BAD_STATUS_MSG_COLOR;
-            STATUS_MSG.innerText = BAD_SERVER_RESPONSE + this.status + "\n" + JSON.stringify(response);
+            STATUS_MSG.innerHTML = FAILURE_MESSAGE(
+                response[KEY_ERROR], 
+                response[KEY_MSG], 
+                this.status);
         }
     }
 
     xhttp.send(JSON.stringify(params));
 }
 
-function addNewDefinition() {
+async function addNewDefinition() {
     const word = INPUT_WORD.value;
     const word_language = INPUT_WORD_LANGUAGE.value;
     const definition = INPUT_DEFINiTION.value;
@@ -175,16 +209,15 @@ function addNewDefinition() {
     if (word === EMPTY_STRING || /\d/.test(word)) {
         // Invalid word
         STATUS_MSG.style.color = BAD_STATUS_MSG_COLOR;
-        STATUS_MSG.innerText = BAD_WORD_MSG;
+        STATUS_MSG.innerHTML = BAD_WORD_MSG;
     } else if (definition === EMPTY_STRING || /\d/.test(definition)) {
         // Invalid definition
         STATUS_MSG.style.color = BAD_STATUS_MSG_COLOR;
-        STATUS_MSG.innerText = BAD_DEFINITION_MSG;
+        STATUS_MSG.innerHTML = BAD_DEFINITION_MSG;
     } else {
         // If work exists, prompt user if they want to update entry.
-        const params = formatParams(word_language, word, definition_language, definition);
-
-        if (wordExists(word)) {
+        const params = FORMAT_PARAMS(word_language, word, definition_language, definition);
+        if (await wordExists(word)) {
             const user_response = window.confirm(WORD_EXISTS_PROMPT);
             if (user_response) { 
                 patchDefinition(params);
@@ -203,7 +236,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
     FORM_DELETE.addEventListener('submit', function(event) {
         event.preventDefault();
-        const word = INPUT_DELETE.value;
-        deleteDefiniion(word);
+        deleteDefinition();
     });
 });
