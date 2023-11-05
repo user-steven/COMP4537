@@ -41,7 +41,6 @@ function search() {
         xhttp.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
                 const response = JSON.parse(this.response);
-                console.log(response);
                 STATUS_MSG.style.color = GOOD_STATUS_MSG_COLOR;
                 STATUS_MSG.innerHTML = FORMAT_SERVER_RESPONSE({
                     message : response[KEY_MSG], 
@@ -55,7 +54,6 @@ function search() {
 
             } else if (this.readyState == 4 && this.status != 200) {
                 const response = JSON.parse(this.response);
-                console.log(response);
                 STATUS_MSG.style.color = BAD_STATUS_MSG_COLOR;
                 STATUS_MSG.innerHTML = FORMAT_SERVER_RESPONSE({
                     error : response[KEY_ERROR], 

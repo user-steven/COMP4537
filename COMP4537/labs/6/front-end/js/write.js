@@ -76,7 +76,6 @@ function populateDropdown() {
 
             INPUT_WORD_LANGUAGE.appendChild(word_option);
             INPUT_DEFINITION_LANGUAGE.appendChild(definition_option);
-            console.log(ERROR, this.status);
         }
     };
     xhttp.send();
@@ -110,7 +109,6 @@ function deleteDefinition() {
         xhttp.onreadystatechange = function () {
             if (this.readyState == 4 && this.status == 200) {
                 const response = JSON.parse(this.response);
-                console.log(response);
 
                 STATUS_MSG.style.color = GOOD_STATUS_MSG_COLOR;
                 STATUS_MSG.innerHTML = FORMAT_SERVER_RESPONSE({
@@ -126,7 +124,6 @@ function deleteDefinition() {
 
             } else if (this.readyState == 4 && this.status != 200) {
                 const response = JSON.parse(this.response);
-                console.log(response);
 
                 STATUS_MSG.style.color = BAD_STATUS_MSG_COLOR;
                 STATUS_MSG.innerHTML = FORMAT_SERVER_RESPONSE({
@@ -148,7 +145,6 @@ function postDefinition(params) {
     xhttp.onreadystatechange = function () {
         if (this.readyState == 4 && this.status == 201) {
             const response = JSON.parse(this.response);
-            console.log(response);
 
             STATUS_MSG.style.color = GOOD_STATUS_MSG_COLOR;
             STATUS_MSG.innerHTML = FORMAT_SERVER_RESPONSE({
@@ -164,7 +160,6 @@ function postDefinition(params) {
 
         } else if (this.readyState == 4 && this.status != 201) {
             const response = JSON.parse(this.response);
-            console.log(response);
 
             STATUS_MSG.style.color = BAD_STATUS_MSG_COLOR;
             STATUS_MSG.innerHTML = FORMAT_SERVER_RESPONSE({
@@ -186,7 +181,6 @@ function patchDefinition(params) {
     xhttp.onreadystatechange = function () {
         if (this.readyState == 4 && this.status == 200) {
             const response = JSON.parse(this.response);
-            console.log(response);
 
             STATUS_MSG.style.color = GOOD_STATUS_MSG_COLOR;
             STATUS_MSG.innerHTML = FORMAT_SERVER_RESPONSE({
@@ -202,7 +196,6 @@ function patchDefinition(params) {
 
         } else if (this.readyState == 4 && this.status != 200) {
             const response = JSON.parse(this.response);
-            console.log(response);
 
             STATUS_MSG.style.color = BAD_STATUS_MSG_COLOR;
             STATUS_MSG.innerHTML = FORMAT_SERVER_RESPONSE({
