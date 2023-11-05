@@ -5,17 +5,21 @@ export const BAD_WORD_MSG = "Your entry is empty or contains numbers. Please ent
 export const BAD_DEFINITION_MSG = "Your entry is empty or contains numbers. Please enter a valid definition.";
 export const WORD_EXISTS_PROMPT = "Word exists, do you want to update?";
 
-export function SUCCESS_MESSAGE(
-    message = '',
-    word = '',
-    definition = '',
-    word_language = '',
-    definiion_language = '',
-    total = '',
-    status_code = ''
-  ) {
-    return `
+export function FORMAT_SERVER_RESPONSE({
+  error = '',
+  message = '',
+  word = '',
+  definition = '',
+  word_language = '',
+  definiion_language = '',
+  total = '',
+  status_code = '',
+  entry = ''
+}) {
+  return `
+      ${entry ? `<p>entry: ${entry}</p>` : ''}
       <p>status code: ${status_code}</p>
+      ${error ? `<p>error: ${error}</p>` : ''}
       ${message ? `<p>message: ${message}</p>` : ''}
       ${word_language ? `<p>word-language: ${word_language}</p>` : ''}
       ${word ? `<p>word: ${word}</p>` : ''}
@@ -23,22 +27,13 @@ export function SUCCESS_MESSAGE(
       ${definition ? `<p>definition: ${definition}</p>` : ''}
       ${total ? `<p>total word in dictionary: ${total}</p>` : ''}
       `;
-  }
-  
-
-export function FAILURE_MESSAGE(error, message, status_code) {
-    return `
-    <p>status code: ${status_code}</p>
-    <p>error: ${error || 'No error message given'}</p>
-    <p>message: ${message}</p>
-    `;
 }
 
 export function FORMAT_PARAMS(word_language, word, definition_language, definition) {
-    return {
-        "word": word,
-        "definition": definition,
-        "word-language": word_language,
-        "definition-language": definition_language
-    };
+  return {
+    "word": word,
+    "definition": definition,
+    "word-language": word_language,
+    "definition-language": definition_language
+  };
 }

@@ -2,8 +2,7 @@ import {
     GOOD_STATUS_MSG_COLOR, 
     BAD_STATUS_MSG_COLOR, 
     BAD_WORD_MSG, 
-    SUCCESS_MESSAGE, 
-    FAILURE_MESSAGE 
+    FORMAT_SERVER_RESPONSE
 } from "./common_strings.js";
 
 const SERVER_URL = "https://nandynano.com/COMP4537/labs/6";
@@ -42,25 +41,30 @@ function search() {
         xhttp.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
                 const response = JSON.parse(this.response);
-
+                console.log(response);
                 STATUS_MSG.style.color = GOOD_STATUS_MSG_COLOR;
-                STATUS_MSG.innerHTML = SUCCESS_MESSAGE(
-                    response[KEY_MSG], 
-                    response[KEY_ENTRY][0][KEY_WORD], 
-                    response[KEY_ENTRY][0][KEY_DEFINITION], 
-                    response[KEY_ENTRY][0][KEY_WORD_LANGUAGE], 
-                    response[KEY_ENTRY][0][KEY_DEFINITION_LANGUAGE], 
-                    response[KEY_TOTAL], 
-                    this.status);
+                STATUS_MSG.innerHTML = FORMAT_SERVER_RESPONSE({
+                    message : response[KEY_MSG], 
+                    definition : response[KEY_ENTRY][0][KEY_DEFINITION], 
+                    word_language : response[KEY_ENTRY][0][KEY_WORD_LANGUAGE], 
+                    definition_language : response[KEY_ENTRY][0][KEY_DEFINITION_LANGUAGE], 
+                    total : response[KEY_TOTAL], 
+                    status_code : this.status,
+                    entry : JSON.stringify(response[KEY_ENTRY])
+                });
 
             } else if (this.readyState == 4 && this.status != 200) {
                 const response = JSON.parse(this.response);
-
+                console.log(response);
                 STATUS_MSG.style.color = BAD_STATUS_MSG_COLOR;
-                STATUS_MSG.innerHTML = FAILURE_MESSAGE(
-                    response[KEY_ERROR], 
-                    response[KEY_MSG], 
-                    this.status);
+                STATUS_MSG.innerHTML = FORMAT_SERVER_RESPONSE({
+                    error : response[KEY_ERROR], 
+                    message : response[KEY_MSG], 
+                    status_code : this.status,
+                    word: response[KEY_ENTRY][KEY_WORD],
+                    total : response[KEY_TOTAL],
+                    entry : JSON.stringify(response[KEY_ENTRY])
+                });
             }
         }
         xhttp.send();
